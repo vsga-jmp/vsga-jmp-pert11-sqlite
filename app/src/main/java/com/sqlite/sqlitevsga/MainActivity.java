@@ -1,8 +1,10 @@
 package com.sqlite.sqlitevsga;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -59,14 +61,13 @@ public class MainActivity extends AppCompatActivity {
         loadUserData();
     }
 
-    @SuppressLint("NotifyDataSetChanged")
     private void loadUserData() {
         userRepository = new UserRepository(this);
         userRepository.open();
 
         List<User> userList = userRepository.getAllUsers();
         if (itemListNameAdapter == null) {
-            itemListNameAdapter = new ItemListNameAdapter(userList);
+            itemListNameAdapter = new ItemListNameAdapter(userList, this::showOptionsDialog);
             recyclerView.setAdapter(itemListNameAdapter);
         } else {
             itemListNameAdapter.updateUserList(userList);
@@ -74,5 +75,31 @@ public class MainActivity extends AppCompatActivity {
         }
 
         userRepository.close();
+    }
+
+    private void showOptionsDialog(User user) {
+        new AlertDialog.Builder(this)
+                .setTitle("Mau ngapain, nih?")
+                .setItems(new String[]{"Update", "Delete"}, (dialog, which) -> {
+                    switch (which) {
+                        case 0:
+                            Intent intent = new Intent(MainActivity.this, EditUserActivity.class);
+                            intent.putExtra("USER_ID", user.getId());
+                            startActivity(intent);
+                            break;
+                        case 1:
+                            deleteUser(user);
+                            break;
+                    }
+                })
+                .show();
+    }
+
+    private void deleteUser(User user) {
+        userRepository.open();
+        userRepository.deleteUser(user.getId());
+        userRepository.close();
+        loadUserData();
+        Toast.makeText(this, "User deleted", Toast.LENGTH_SHORT).show();
     }
 }

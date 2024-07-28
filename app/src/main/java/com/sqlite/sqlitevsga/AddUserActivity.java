@@ -37,7 +37,7 @@ public class AddUserActivity extends AppCompatActivity {
 
     void initializeOnClickListeners() {
         btnBack.setOnClickListener(v -> {
-            finish();  // Close activity and return to MainActivity
+            finish();
         });
 
         btnSubmit.setOnClickListener(v -> {
@@ -49,7 +49,7 @@ public class AddUserActivity extends AppCompatActivity {
             } else {
                 insertDataToSQLite(name, domisili);
                 Toast.makeText(AddUserActivity.this, "User data submitted", Toast.LENGTH_SHORT).show();
-                finish();  // Close activity and return to MainActivity
+                finish();
             }
         });
     }

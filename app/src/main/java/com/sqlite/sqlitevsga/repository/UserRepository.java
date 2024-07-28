@@ -84,6 +84,42 @@ public class UserRepository {
         return users;
     }
 
+    public User getUserById(long id) {
+        User user = null;
+        Cursor cursor = null;
+        try {
+            cursor = database.query(DatabaseHelper.TABLE_USER,
+                    new String[]{DatabaseHelper.COLUMN_ID, DatabaseHelper.COLUMN_NAME, DatabaseHelper.COLUMN_DOMISILI},
+                    DatabaseHelper.COLUMN_ID + " = ?",
+                    new String[]{String.valueOf(id)},
+                    null, null, null);
+
+            if (cursor != null && cursor.moveToFirst()) {
+                int idIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_ID);
+                int nameIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_NAME);
+                int domisiliIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_DOMISILI);
+
+                if (idIndex != -1 && nameIndex != -1 && domisiliIndex != -1) {
+                    long userId = cursor.getLong(idIndex);
+                    String name = cursor.getString(nameIndex);
+                    String domisili = cursor.getString(domisiliIndex);
+                    user = new User(userId, name, domisili);
+                } else {
+                    Log.e("UserRepository", "One or more columns are missing in the cursor");
+                }
+            } else {
+                Log.e("UserRepository", "Cursor is null or empty");
+            }
+        } catch (Exception e) {
+            Log.e("UserRepository", "Error while fetching user by ID: " + e.getMessage());
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return user;
+    }
+
     public int updateUser(long id, String name, String domisili) {
         ContentValues values = new ContentValues();
         values.put(DatabaseHelper.COLUMN_NAME, name);

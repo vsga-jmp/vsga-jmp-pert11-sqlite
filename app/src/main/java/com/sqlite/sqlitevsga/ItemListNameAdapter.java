@@ -16,9 +16,15 @@ import java.util.List;
 public class ItemListNameAdapter extends RecyclerView.Adapter<ItemListNameAdapter.ItemViewHolder> {
 
     private List<User> userList;
+    private OnItemLongClickListener onItemLongClickListener;
 
-    public ItemListNameAdapter(List<User> userList) {
+    public interface OnItemLongClickListener {
+        void onItemLongClick(User user);
+    }
+
+    public ItemListNameAdapter(List<User> userList, OnItemLongClickListener listener) {
         this.userList = userList;
+        this.onItemLongClickListener = listener;
     }
 
     @NonNull
@@ -33,6 +39,13 @@ public class ItemListNameAdapter extends RecyclerView.Adapter<ItemListNameAdapte
         User user = userList.get(position);
         holder.tvName.setText(user.getName());
         holder.tvDomisili.setText(user.getDomisili());
+
+        holder.itemView.setOnLongClickListener(v -> {
+            if (onItemLongClickListener != null) {
+                onItemLongClickListener.onItemLongClick(user);
+            }
+            return true;
+        });
     }
 
     @Override
